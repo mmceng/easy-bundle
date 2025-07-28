@@ -1,0 +1,69 @@
+bundle:
+  name: test-bundle
+
+resources:
+  jobs:
+    test_pipeline:
+      name: test_${bundle.target}
+      tasks:
+        - task_key: "1"
+          notebook_task:
+            notebook_path: pipelines/test/1
+            source: GIT
+
+        - task_key: "2"
+          depends_on:
+            - task_key: "1"
+          notebook_task:
+            notebook_path: pipelines/test/2
+            source: GIT
+        - task_key: "3"
+          depends_on:
+            - task_key: "2"
+          notebook_task:
+            notebook_path: pipelines/test/3
+            source: GIT
+      git_source:
+        git_url: https://github.com/mmceng/workflows.git
+        git_provider: gitHub
+        git_branch: ${bundle.target}
+
+    test_pipeline2:
+      name: test_2_${bundle.target}
+      tasks:
+        - task_key: "1"
+          notebook_task:
+            notebook_path: pipelines/test_2/1
+            source: GIT
+
+        - task_key: "2"
+          depends_on:
+            - task_key: "1"
+          notebook_task:
+            notebook_path: pipelines/test_2/2
+            source: GIT
+
+      git_source:
+        git_url: https://github.com/mmceng/workflows.git
+        git_provider: gitHub
+        git_branch: ${bundle.target}
+
+      queue:
+        enabled: true
+
+targets:
+  dev:
+    workspace:
+      host: https://dbc-0108b1cd-a5f1.cloud.databricks.com
+      root_path: /Shared/workflows/dev
+    default: true
+
+  qa:
+    workspace:
+      host: https://dbc-0108b1cd-a5f1.cloud.databricks.com
+      root_path: /Shared/workflows/qa
+
+  prod:
+    workspace:
+      host: https://dbc-0108b1cd-a5f1.cloud.databricks.com
+      root_path: /Shared/workflows/prod
